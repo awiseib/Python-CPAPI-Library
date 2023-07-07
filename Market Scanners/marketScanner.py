@@ -1,6 +1,5 @@
 # Library Imports
 import requests
-import time
 import urllib3
 import json
 
@@ -8,30 +7,30 @@ import json
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def reqIserverScanner():
-    scan_url = "https://localhost:5000/v1/api/iserver/scanner/run"
+    base_url = "https://localhost:5000/v1/api/"
+    endpoint = "iserver/scanner/run"
+
     scan_body = {
         "instrument": "STK",
-        "locations": "STK.US.MAJOR",
+        "location": "STK.US.MAJOR",
         "type": "TOP_PERC_GAIN",
-        "filter":[
+        "filter": [
             {
                 "code":"priceAbove",
-                "value": 100, 
+                "value":101
             },
             {
                 "code":"priceBelow",
-                "value": 110, 
+                "value":110
             }
         ]
     }
-    scan_req = requests.post(url=scan_url, verify=False, json=scan_body)
-    
-    # print(scan_req)
-    # print(scan_req.text)
-    results = json.loads(scan_req.text)["contracts"]
-    for i in results:
-        print(i)
 
+    scan_req = requests.post(url=base_url+endpoint, verify=False, json=scan_body)
+    scan_json = json.dumps(scan_req.json(), indent=2)
+
+    print(scan_req.status_code)
+    print(scan_json)
     
 if __name__ == "__main__":
     reqIserverScanner()

@@ -11,7 +11,7 @@ def createAlert():
     json_body = {
         "alertMessage": "THIS IS MY SUCCESSFUL TEST ALERT", 
         "alertName": "AAPL", 
-        "alertRepeatable": 0,
+        "alertRepeatable": 1,
         "conditions": [ 
             {
             "conidex": "265598@SMART", 
@@ -19,14 +19,14 @@ def createAlert():
             "operator": ">=", 
             "triggerMethod": "0", 
             "type": 1, 
-            "value": "180" 
+            "value": "192.08" 
             }
         ],
-        "email": "emailname@domain.com",
-        "iTWSOrdersOnly": 0, 
         "outsideRth": 1,
-        "sendMessage": 1,
-        "showPopup": 1, 
+        "sendMessage": 1, # Send an Email
+        "email": "awise@interactivebrokers.com",
+        "iTWSOrdersOnly": 0, # IBKR Mobile Notification 
+        "showPopup": 1,  #  Create popup alert
         "tif": "GTC" 
     }
 
@@ -34,6 +34,10 @@ def createAlert():
 
     print(alert_req.status_code)
     if alert_req.status_code == 200:
+        alert_json = json.dumps(alert_req.json(), indent=2)
+        print(alert_json)
+    else:
+        
         alert_json = json.dumps(alert_req.json(), indent=2)
         print(alert_json)
 
