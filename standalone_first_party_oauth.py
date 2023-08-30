@@ -253,7 +253,7 @@ else:
 
 # Initial, non-computed elements of request to /portfolio/accounts.
 method = 'GET'
-url = 'https://api.ibkr.com/v1/api/iserver/auth/sodh/init?publish=true&compete=true'
+url = 'https://api.ibkr.com/v1/api/iserver/auth/ssodh/init?publish=true&compete=true'
 oauth_params = {
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
@@ -376,7 +376,12 @@ def on_close(ws):
 
 def on_open(ws):
     print("Opened Connection")
-    conids = ["265598"]
+    conids = [
+        "479624278", # BTC
+        "498989715", # LTC
+        "498989721", # BCH
+        "495759171"  # ETH
+    ]
 
     for conid in conids:
         ws.send('smd+'+conid+'+{"fields":["31","84","86"]}')
