@@ -54,27 +54,33 @@ def pretty_request_response(resp: requests.Response) -> str:
 # Prequisites: Enter paths to keys and access token/secret below
 # -------------------------------------------------------------------
 
+# I have a JSON file contianing my credentials.
+# You will need to replace the filepath to recognize your own. 
+# # Alternatively, create a string directly linking to the various PEM files or strings referenced. 
+credentials = json.load(open(file=r"D:\Code\Python CPAPI Library\credentials.json", mode="r"))
+current_user = credentials['user2']
+
 # Replace with path to private encryption key file.
-with open("", "r") as f:
+with open(current_user['encryption'], "r") as f:
     encryption_key = RSA.importKey(f.read())
 
 # Replace with path to private signature key file.
-with open("", "r") as f:
+with open(current_user['signature'], "r") as f:
     signature_key = RSA.importKey(f.read())
 
-# Replace with path to DH prime PEM file.
-with open("", "r") as f:
+# Replace with path to DH param PEM file.
+with open(current_user['dhparam'], "r") as f:
     dh_param = RSA.importKey(f.read())
     dh_prime = dh_param.n
     dh_generator = dh_param.e  # always =2
 
 # Enter your access token and access token secret here.
-access_token = ""
-access_token_secret = ""
+access_token = current_user['access_token']
+access_token_secret = current_user['access_token_secret']
 
 # If substituting your own consumer key created via the Self-Service Portal,
 # change realm to "limited_poa" (test_realm is for TESTCONS only).
-consumer_key = ""
+consumer_key = current_user['consumer_key']
 realm = "limited_poa"
 
 session_object = requests.Session()
@@ -376,16 +382,16 @@ def on_close(ws):
 
 def on_open(ws):
     print("Opened Connection")
+    time.sleep(3)
     conids = [
-        "479624278", # BTC
-        "498989715", # LTC
-        "498989721", # BCH
-        "495759171"  # ETH
+        "479624278@PAXOS", # BTC
+        "498989715@PAXOS", # LTC
+        "498989721@PAXOS", # BCH
+        "495759171@PAXOS"  # ETH
     ]
 
     for conid in conids:
         ws.send('smd+'+conid+'+{"fields":["31","84","86"]}')
-        ws.send('umd+'+conid+'+{}')
 
 if __name__ == "__main__":
     ws = websocket.WebSocketApp(
