@@ -12,7 +12,7 @@ def scanParams():
     params_req = requests.get(url=base_url+endpoint, verify=False)
     params_json = json.dumps(params_req.json(), indent=2)
 
-    paramFiles = open("./scannerParams.xml", "w")
+    paramFiles = open("./iserverScannerParams.xml", "w")
     
     for i in params_json:
         paramFiles.write(i)
