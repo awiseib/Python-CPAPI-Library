@@ -22,11 +22,16 @@ def main():
         "orders": [
             {
             "conid": 8314,
+            # "cOID": "RAOUZ_TEST_2",
+            "listingExchange": "SMART",
+            "ticker": "IBM",
+            "outsideRTH": True,
+
             "orderType": "LMT",
             "price":130,
-            "side": "BUY",
+            "side": "SELL",
             "tif": "DAY",
-            "quantity":11,
+            "quantity":3,
             }
         ]
     }

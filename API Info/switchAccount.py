@@ -10,7 +10,7 @@ def switchAccount():
     endpoint = "iserver/account"
 
     acct_body = {
-        "acctId":"video_group"
+        "acctId":"DU74649"
     }
 
     md_req = requests.post(url=base_url+endpoint, verify=False, json=acct_body)

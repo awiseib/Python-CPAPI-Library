@@ -7,12 +7,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def marketSnapshot():
     base_url = "https://localhost:5000/v1/api/"
-    endpoint = "iserver/marketdata/snapshot"
+    endpoint = "fyi/notifications/more"
 
-    conid="conids=265598,8314"
-    fields="fields=31,84,86,55,87"
+    id ="id=" # What is the ID? It doesn't return anything from the getNotiifications request.
 
-    params = "&".join([conid, fields])
+    params = "&".join([id])
     request_url = "".join([base_url, endpoint, "?", params])
 
     md_req = requests.get(url=request_url, verify=False)

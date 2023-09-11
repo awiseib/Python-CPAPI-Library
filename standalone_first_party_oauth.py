@@ -56,7 +56,7 @@ def pretty_request_response(resp: requests.Response) -> str:
 
 # I have a JSON file contianing my credentials.
 # You will need to replace the filepath to recognize your own. 
-# # Alternatively, create a string directly linking to the various PEM files or strings referenced. 
+# Alternatively, create a string directly linking to the various PEM files or strings referenced. 
 credentials = json.load(open(file=r"D:\Code\Python CPAPI Library\credentials.json", mode="r"))
 current_user = credentials['user2']
 
@@ -384,14 +384,16 @@ def on_open(ws):
     print("Opened Connection")
     time.sleep(3)
     conids = [
-        "479624278@PAXOS", # BTC
-        "498989715@PAXOS", # LTC
-        "498989721@PAXOS", # BCH
-        "495759171@PAXOS"  # ETH
+        "265598",
+        "8314"
+        # "479624278@PAXOS", # BTC
+        # "498989715@PAXOS", # LTC
+        # "498989721@PAXOS", # BCH
+        # "495759171@PAXOS"  # ETH
     ]
 
     for conid in conids:
-        ws.send('smd+'+conid+'+{"fields":["31","84","86"]}')
+        ws.send('smd+'+conid+'+{"fields":["31","84","86","87"]}')
 
 if __name__ == "__main__":
     ws = websocket.WebSocketApp(

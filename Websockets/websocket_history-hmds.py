@@ -14,11 +14,9 @@ def on_close(ws):
 def on_open(ws):
     print("Opened connection")
     time.sleep(3)
-    acctId = "DU5240685"
     myConids = ["265598"]
     for i in myConids:
-        ws.send('sbd+'+acctId+'+'+i)
-        time.sleep(1)
+        ws.send('hdr+'+i+'+{"exchange":"ISLAND","period":"300S","bar":"5secs","outsideRth":false,"source":"trades"}')
 
 
 if __name__ == "__main__":

@@ -9,15 +9,15 @@ def orderModify():
   
     base_url = "https://localhost:5000/v1/api/"
     endpoint = "iserver/account/DU5240685/order/"
-    order_id = "1010551027"
+    order_id = "366866174"
 
     json_body= {
-        "conid": 265598,
+        "conid": 568549928  ,
         "orderType":"STP",
-        "price": 190,
+        "price": 15582,
         "side":"BUY",
         "tif":"DAY",
-        "quantity":10
+        "quantity":1
     }
 
     modify_url = "".join([base_url, endpoint, order_id])

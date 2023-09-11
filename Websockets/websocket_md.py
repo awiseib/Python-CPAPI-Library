@@ -14,7 +14,7 @@ def on_close(ws):
 def on_open(ws):
     print("Opened Connection")
     time.sleep(3)
-    conids = ["265598", "8314"]
+    conids = ["8314"]
 
     for conid in conids:
         ws.send('smd+'+conid+'+{"fields":["31","84","86"]}')

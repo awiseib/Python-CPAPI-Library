@@ -8,7 +8,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 def acctPos():
   
     base_url = "https://localhost:5000/v1/api/"
-    endpoint = "portfolio/DU5240685/positions/0"
+    endpoint = "portfolio/DU74649/positions/0"
     
     pos_req = requests.get(url=base_url+endpoint, verify=False)
     pos_json = json.dumps(pos_req.json(), indent=2)

@@ -11,34 +11,26 @@ def orderRequest():
     endpoint = "iserver/account/DU5240685/orders"
 
     json_body = {
-        "orders": [
+        "orders":[
             {
-            "cOID": "AAPL_BRACKET_MMDD",
-            "conid": 265598,
-            "orderType": "MKT",
-            "side": "BUY",
-            "tif": "DAY",
-            "quantity": 10
-            },
-            {
-            "parentId":"AAPL_BRACKET_MMDD",
-            "cOID": "AAPL_BRACKET_MMDD-PT",
-            "conid": 265598,
+            "cOID":"NQ_STOP_oRTH3",
+            "conid": 568549928,
             "orderType": "LMT",
-            "price":190,
-            "side": "BUY",
+            "price":15584.25,
+            "side": "SELL",
             "tif": "DAY",
-            "quantity": 10
+            "quantity": 1,
+            "outsideRth":1
             },
             {
-            "parentId":"AAPL_BRACKET_MMDD",
-            "cOID": "AAPL_BRACKET_MMDD-SL",
-            "conid": 265598,
+            "parentId":"NQ_STOP_oRTH3",
+            "conid": 568549928,
             "orderType": "STP",
-            "price":185,
+            "price":15590,
             "side": "BUY",
             "tif": "DAY",
-            "quantity": 10
+            "quantity": 1,
+            "outsideRth":1
             }
         ]
     }
