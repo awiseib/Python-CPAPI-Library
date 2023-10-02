@@ -88,6 +88,10 @@ live_session_token = None
 lst_expiration = None
 session_cookie = None
 
+baseUrl = "api.ibkr.com/v1/api" # LIVE
+# baseUrl = "api.ibkr.com/alpha/api" # Alpha
+
+
 # -------------------------------------------------------------------
 # Request #1: Obtaining a LST
 # -------------------------------------------------------------------
@@ -122,7 +126,7 @@ base_string = prepend
 
 # Elements of the LST request so far.
 method = 'POST'
-url = 'https://api.ibkr.com/v1/api/oauth/live_session_token'
+url = f'https://{baseUrl}/oauth/live_session_token'
 oauth_params = {
     "oauth_consumer_key": consumer_key,
     "oauth_nonce": hex(random.getrandbits(128))[2:],
@@ -254,12 +258,70 @@ else:
     
 
 # -------------------------------------------------------------------
+# Request #0: Logout to kill prior sessions
+# -------------------------------------------------------------------
+
+# Initial, non-computed elements of request to /portfolio/accounts.
+# method = 'POST'
+# url = f'https://{baseUrl}/logout'
+# oauth_params = {
+#         "oauth_consumer_key": consumer_key,
+#         "oauth_nonce": hex(random.getrandbits(128))[2:],
+#         "oauth_signature_method": "HMAC-SHA256",
+#         "oauth_timestamp": str(int(datetime.now().timestamp())),
+#         "oauth_token": access_token
+#     }
+
+# # ----------------------------------
+# # Generate request OAuth signature.
+# # ----------------------------------
+
+# # Combined param key=value pairs must be sorted alphabetically by key
+# # and ampersand-separated.
+# params_string = "&".join([f"{k}={v}" for k, v in sorted(oauth_params.items())])
+
+# # Base string = method + url + sorted params string, all URL-encoded.
+# base_string = f"{method}&{quote_plus(url)}&{quote(params_string)}"
+
+# # Generate bytestring HMAC hash of base string bytestring.
+# # Hash key is base64-decoded LST bytestring, method is SHA256.
+# bytes_hmac_hash = HMAC.new(
+#     key=base64.b64decode(live_session_token), 
+#     msg=base_string.encode("utf-8"),
+#     digestmod=SHA256
+#     ).digest()
+
+# # Generate str from base64-encoded bytestring hash.
+# b64_str_hmac_hash = base64.b64encode(bytes_hmac_hash).decode("utf-8")
+
+# # URL-encode the base64 hash str and add to oauth params dict.
+# oauth_params["oauth_signature"] = quote_plus(b64_str_hmac_hash)
+
+# # Oauth realm param omitted from signature, added to header afterward.
+# oauth_params["realm"] = realm
+
+# # Assemble oauth params into auth header value as comma-separated str.
+# oauth_header = "OAuth " + ", ".join([f'{k}="{v}"' for k, v in sorted(oauth_params.items())])
+
+# # Create dict for LST request headers including OAuth Authorization header.
+# headers = {"Authorization": oauth_header}
+
+# # Add User-Agent header, required for all requests. Can have any value.
+# headers["User-Agent"] = "python/3.11"
+
+# # Prepare and send request to /portfolio/accounts, print request and response.
+# accounts_request = requests.Request(method=method, url=url, headers=headers)
+# accounts_response = session_object.send(accounts_request.prepare())
+# print(pretty_request_response(accounts_response))
+
+
+# -------------------------------------------------------------------
 # Request #2: Initiate session with ssodh/init
 # -------------------------------------------------------------------
 
 # Initial, non-computed elements of request to /portfolio/accounts.
 method = 'GET'
-url = 'https://api.ibkr.com/v1/api/iserver/auth/ssodh/init?publish=true&compete=true'
+url = f'https://{baseUrl}/iserver/auth/ssodh/init?publish=true&compete=true'
 oauth_params = {
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
@@ -316,7 +378,7 @@ print(pretty_request_response(accounts_response))
 
 # Initial, non-computed elements of request to /portfolio/accounts.
 method = 'GET'
-url = 'https://api.ibkr.com/v1/api/tickle'
+url = f'https://{baseUrl}/tickle'
 oauth_params = {
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
@@ -382,10 +444,10 @@ def on_close(ws):
 
 def on_open(ws):
     print("Opened Connection")
-    time.sleep(3)
+    # time.sleep(3)
     conids = [
-        "265598",
-        "8314"
+        "12087792" # EUR.USD
+        # "479624278"
         # "479624278@PAXOS", # BTC
         # "498989715@PAXOS", # LTC
         # "498989721@PAXOS", # BCH
@@ -393,11 +455,11 @@ def on_open(ws):
     ]
 
     for conid in conids:
-        ws.send('smd+'+conid+'+{"fields":["31","84","86","87"]}')
+        ws.send('sbd+DU5240685+'+conid)
 
 if __name__ == "__main__":
     ws = websocket.WebSocketApp(
-        url=f"wss://api.ibkr.com/v1/api/ws?oauth_token={access_token}",
+        url=f"wss://{baseUrl}/ws?oauth_token={access_token}",
         on_open=on_open,
         on_message=on_message,
         on_error=on_error,

@@ -5,11 +5,11 @@ import urllib3
 # Ignore insecure error messages
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-def orderReply():
+def orderReply(replyId="2569ea05-ef61-4d2c-b124-a65cbd52eeed"):
   
     base_url = "https://localhost:5000/v1/api/"
     endpoint = "iserver/reply/"
-    replyId = "bda1700e-cbd8-48c1-b9b0-2d8d4921a177"
+    
 
     reply_url = "".join([base_url, endpoint, replyId])
 

@@ -12,9 +12,10 @@ def orderRequest():
 
     json_body = {
         "orders": [{
-            "conid": 265598,
-            "orderType": "LMT",
-            "price":190,
+            "conid": 497222760,
+            "orderType": "STP LMT",
+            "price":4450,
+            "auxPrice":4460,
             "side": "BUY",
             "tif": "DAY",
             "quantity": 10
@@ -27,6 +28,13 @@ def orderRequest():
 
     print(order_req.status_code)
     print(order_json)
+    try:
+        if order_req.json()[0]["id"]:
+            print(order_req.json()[0]["id"])
+        else:
+            print(order_req.json()[0]["id"])
+    except:
+        pass
 
 if __name__ == "__main__":
     orderRequest()
