@@ -58,7 +58,7 @@ def pretty_request_response(resp: requests.Response) -> str:
 # You will need to replace the filepath to recognize your own. 
 # Alternatively, create a string directly linking to the various PEM files or strings referenced. 
 credentials = json.load(open(file=r"D:\Code\Python CPAPI Library\credentials.json", mode="r"))
-current_user = credentials['user2']
+current_user = credentials['user4']
 
 # Replace with path to private encryption key file.
 with open(current_user['encryption'], "r") as f:
@@ -82,6 +82,7 @@ access_token_secret = current_user['access_token_secret']
 # change realm to "limited_poa" (test_realm is for TESTCONS only).
 consumer_key = current_user['consumer_key']
 realm = "limited_poa"
+# realm = "test_realm"
 
 session_object = requests.Session()
 live_session_token = None
@@ -262,57 +263,57 @@ else:
 # -------------------------------------------------------------------
 
 # Initial, non-computed elements of request to /portfolio/accounts.
-# method = 'POST'
-# url = f'https://{baseUrl}/logout'
-# oauth_params = {
-#         "oauth_consumer_key": consumer_key,
-#         "oauth_nonce": hex(random.getrandbits(128))[2:],
-#         "oauth_signature_method": "HMAC-SHA256",
-#         "oauth_timestamp": str(int(datetime.now().timestamp())),
-#         "oauth_token": access_token
-#     }
+method = 'POST'
+url = f'https://{baseUrl}/logout'
+oauth_params = {
+        "oauth_consumer_key": consumer_key,
+        "oauth_nonce": hex(random.getrandbits(128))[2:],
+        "oauth_signature_method": "HMAC-SHA256",
+        "oauth_timestamp": str(int(datetime.now().timestamp())),
+        "oauth_token": access_token
+    }
 
-# # ----------------------------------
-# # Generate request OAuth signature.
-# # ----------------------------------
+# ----------------------------------
+# Generate request OAuth signature.
+# ----------------------------------
 
-# # Combined param key=value pairs must be sorted alphabetically by key
-# # and ampersand-separated.
-# params_string = "&".join([f"{k}={v}" for k, v in sorted(oauth_params.items())])
+# Combined param key=value pairs must be sorted alphabetically by key
+# and ampersand-separated.
+params_string = "&".join([f"{k}={v}" for k, v in sorted(oauth_params.items())])
 
-# # Base string = method + url + sorted params string, all URL-encoded.
-# base_string = f"{method}&{quote_plus(url)}&{quote(params_string)}"
+# Base string = method + url + sorted params string, all URL-encoded.
+base_string = f"{method}&{quote_plus(url)}&{quote(params_string)}"
 
-# # Generate bytestring HMAC hash of base string bytestring.
-# # Hash key is base64-decoded LST bytestring, method is SHA256.
-# bytes_hmac_hash = HMAC.new(
-#     key=base64.b64decode(live_session_token), 
-#     msg=base_string.encode("utf-8"),
-#     digestmod=SHA256
-#     ).digest()
+# Generate bytestring HMAC hash of base string bytestring.
+# Hash key is base64-decoded LST bytestring, method is SHA256.
+bytes_hmac_hash = HMAC.new(
+    key=base64.b64decode(live_session_token), 
+    msg=base_string.encode("utf-8"),
+    digestmod=SHA256
+    ).digest()
 
-# # Generate str from base64-encoded bytestring hash.
-# b64_str_hmac_hash = base64.b64encode(bytes_hmac_hash).decode("utf-8")
+# Generate str from base64-encoded bytestring hash.
+b64_str_hmac_hash = base64.b64encode(bytes_hmac_hash).decode("utf-8")
 
-# # URL-encode the base64 hash str and add to oauth params dict.
-# oauth_params["oauth_signature"] = quote_plus(b64_str_hmac_hash)
+# URL-encode the base64 hash str and add to oauth params dict.
+oauth_params["oauth_signature"] = quote_plus(b64_str_hmac_hash)
 
-# # Oauth realm param omitted from signature, added to header afterward.
-# oauth_params["realm"] = realm
+# Oauth realm param omitted from signature, added to header afterward.
+oauth_params["realm"] = realm
 
-# # Assemble oauth params into auth header value as comma-separated str.
-# oauth_header = "OAuth " + ", ".join([f'{k}="{v}"' for k, v in sorted(oauth_params.items())])
+# Assemble oauth params into auth header value as comma-separated str.
+oauth_header = "OAuth " + ", ".join([f'{k}="{v}"' for k, v in sorted(oauth_params.items())])
 
-# # Create dict for LST request headers including OAuth Authorization header.
-# headers = {"Authorization": oauth_header}
+# Create dict for LST request headers including OAuth Authorization header.
+headers = {"Authorization": oauth_header}
 
-# # Add User-Agent header, required for all requests. Can have any value.
-# headers["User-Agent"] = "python/3.11"
+# Add User-Agent header, required for all requests. Can have any value.
+headers["User-Agent"] = "python/3.11"
 
-# # Prepare and send request to /portfolio/accounts, print request and response.
-# accounts_request = requests.Request(method=method, url=url, headers=headers)
-# accounts_response = session_object.send(accounts_request.prepare())
-# print(pretty_request_response(accounts_response))
+# Prepare and send request to /portfolio/accounts, print request and response.
+accounts_request = requests.Request(method=method, url=url, headers=headers)
+accounts_response = session_object.send(accounts_request.prepare())
+print(pretty_request_response(accounts_response))
 
 
 # -------------------------------------------------------------------
@@ -378,13 +379,14 @@ print(pretty_request_response(accounts_response))
 
 # Initial, non-computed elements of request to /portfolio/accounts.
 method = 'GET'
-url = f'https://{baseUrl}/tickle'
+url = f'https://{baseUrl}/iserver/account/allocation/accounts'
 oauth_params = {
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
         "oauth_signature_method": "HMAC-SHA256",
         "oauth_timestamp": str(int(datetime.now().timestamp())),
-        "oauth_token": access_token
+        "oauth_token": access_token,
+        "oauth_callback": "oob"
     }
 
 # ----------------------------------
@@ -428,43 +430,3 @@ headers["User-Agent"] = "python/3.11"
 accounts_request = requests.Request(method=method, url=url, headers=headers)
 accounts_response = session_object.send(accounts_request.prepare())
 print(pretty_request_response(accounts_response))
-
-# Store web API session cookie value, if it is received.
-# (Used when opening websocket.)
-session_cookie = accounts_response.json()['session']
-
-def on_message(ws, message):
-    print(message)
-
-def on_error(ws, error):
-    print(error)
-
-def on_close(ws):
-    print("## CLOSED! ##")
-
-def on_open(ws):
-    print("Opened Connection")
-    # time.sleep(3)
-    conids = [
-        "12087792" # EUR.USD
-        # "479624278"
-        # "479624278@PAXOS", # BTC
-        # "498989715@PAXOS", # LTC
-        # "498989721@PAXOS", # BCH
-        # "495759171@PAXOS"  # ETH
-    ]
-
-    for conid in conids:
-        ws.send('sbd+DU5240685+'+conid)
-
-if __name__ == "__main__":
-    ws = websocket.WebSocketApp(
-        url=f"wss://{baseUrl}/ws?oauth_token={access_token}",
-        on_open=on_open,
-        on_message=on_message,
-        on_error=on_error,
-        on_close=on_close,
-        header=["User-Agent: python/3.11"],
-        cookie=f"api={session_cookie}"
-    )
-    ws.run_forever()
