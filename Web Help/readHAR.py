@@ -3,10 +3,10 @@ from haralyzer import HarParser
     
    
 def main():
-    HAR = "D:\\Downloads\\es.tradingview.com.har"
-    newFile = "C:\\Users\\awise\\Desktop\\cleanHar.txt"
+    HAR = "D:\\Downloads\\503_5.har"
+    newFile = "D:\\Downloads\\503_5-cleanHar.har"
 
-    with open(file=HAR, mode='r', encoding="UTF-8") as f:
+    with open(file=HAR, mode='r', encoding="utf-8-sig") as f:
         har_parser = HarParser(json.loads(f.read()))
 
     data = har_parser.har_data
@@ -19,6 +19,12 @@ def main():
         cleanHar.write(f"URL: {request_root['url']}\n")
         cleanHar.write(f"Query: {request_root['queryString']}\n")
         cleanHar.write('\n'.join(f'{i}' for i in request_root['headers']))
+        cleanHar.write("\n")
+        try:
+            cleanHar.write(request_root['postData']['text'])
+            cleanHar.write("\n")
+        except:
+            pass
         
         response_root = data["entries"][i]["response"]
         cleanHar.write('\n-----------RESPONSE-----------\n')

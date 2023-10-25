@@ -309,9 +309,9 @@ headers = {"Authorization": oauth_header}
 headers["User-Agent"] = "python/3.11"
 
 # Prepare and send request to /portfolio/accounts, print request and response.
-accounts_request = requests.Request(method=method, url=url, headers=headers)
-accounts_response = session_object.send(accounts_request.prepare())
-print(pretty_request_response(accounts_response))
+logout_request = requests.Request(method=method, url=url, headers=headers)
+logout_response = session_object.send(logout_request.prepare())
+print(pretty_request_response(logout_response))
 
 
 # -------------------------------------------------------------------
@@ -367,9 +367,9 @@ headers = {"Authorization": oauth_header}
 headers["User-Agent"] = "python/3.11"
 
 # Prepare and send request to /portfolio/accounts, print request and response.
-accounts_request = requests.Request(method=method, url=url, headers=headers)
-accounts_response = session_object.send(accounts_request.prepare())
-print(pretty_request_response(accounts_response))
+init_request = requests.Request(method=method, url=url, headers=headers)
+init_response = session_object.send(init_request.prepare())
+print(pretty_request_response(init_response))
 
 # -------------------------------------------------------------------
 # Request #3: Using LST to request /portfolio/accounts
@@ -424,13 +424,16 @@ headers = {"Authorization": oauth_header}
 headers["User-Agent"] = "python/3.11"
 
 # Prepare and send request to /portfolio/accounts, print request and response.
-accounts_request = requests.Request(method=method, url=url, headers=headers)
-accounts_response = session_object.send(accounts_request.prepare())
-print(pretty_request_response(accounts_response))
+tickle_request = requests.Request(method=method, url=url, headers=headers)
+tickle_response = session_object.send(tickle_request.prepare())
+print(pretty_request_response(tickle_response))
+
+global TICKLE_COOKIE
+TICKLE_COOKIE = tickle_response.json()['session']
 
 # Store web API session cookie value, if it is received.
 # (Used when opening websocket.)
-session_cookie = accounts_response.json()['session']
+# session_cookie = TICKLE_COOKIE
 
 def on_message(ws, message):
     print(message)
@@ -438,11 +441,14 @@ def on_message(ws, message):
 def on_error(ws, error):
     print(error)
 
-def on_close(ws):
+def on_close(ws, r1, r2):
     print("## CLOSED! ##")
+    print(f"r1:{r1}")
+    print(f"r2:{r2}")
 
 def on_open(ws):
     print("Opened Connection")
+    ws.send('{"session":"%s"}' % TICKLE_COOKIE)
     # time.sleep(3)
     conids = [
         # "12087792" # EUR.USD
@@ -464,6 +470,6 @@ if __name__ == "__main__":
         on_error=on_error,
         on_close=on_close,
         header=["User-Agent: python/3.11"],
-        cookie=f"api={session_cookie}"
+        # cookie=f"api={session_cookie}"
     )
     ws.run_forever()
