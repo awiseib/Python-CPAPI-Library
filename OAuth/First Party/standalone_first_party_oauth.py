@@ -58,7 +58,7 @@ def pretty_request_response(resp: requests.Response) -> str:
 # You will need to replace the filepath to recognize your own. 
 # Alternatively, create a string directly linking to the various PEM files or strings referenced. 
 credentials = json.load(open(file=r"D:\Code\Python CPAPI Library\credentials.json", mode="r"))
-current_user = credentials['user4']
+current_user = credentials['user2']
 
 # Replace with path to private encryption key file.
 with open(current_user['encryption'], "r") as f:
@@ -82,7 +82,6 @@ access_token_secret = current_user['access_token_secret']
 # change realm to "limited_poa" (test_realm is for TESTCONS only).
 consumer_key = current_user['consumer_key']
 realm = "limited_poa"
-# realm = "test_realm"
 
 session_object = requests.Session()
 live_session_token = None
@@ -262,7 +261,6 @@ else:
 # Request #0: Logout to kill prior sessions
 # -------------------------------------------------------------------
 
-# Initial, non-computed elements of request to /portfolio/accounts.
 method = 'POST'
 url = f'https://{baseUrl}/logout'
 oauth_params = {
@@ -311,9 +309,9 @@ headers = {"Authorization": oauth_header}
 headers["User-Agent"] = "python/3.11"
 
 # Prepare and send request to /portfolio/accounts, print request and response.
-accounts_request = requests.Request(method=method, url=url, headers=headers)
-accounts_response = session_object.send(accounts_request.prepare())
-print(pretty_request_response(accounts_response))
+logout_request = requests.Request(method=method, url=url, headers=headers)
+logout_response = session_object.send(logout_request.prepare())
+print(pretty_request_response(logout_response))
 
 
 # -------------------------------------------------------------------
@@ -369,9 +367,9 @@ headers = {"Authorization": oauth_header}
 headers["User-Agent"] = "python/3.11"
 
 # Prepare and send request to /portfolio/accounts, print request and response.
-accounts_request = requests.Request(method=method, url=url, headers=headers)
-accounts_response = session_object.send(accounts_request.prepare())
-print(pretty_request_response(accounts_response))
+init_request = requests.Request(method=method, url=url, headers=headers)
+init_response = session_object.send(init_request.prepare())
+print(pretty_request_response(init_response))
 
 # -------------------------------------------------------------------
 # Request #3: Using LST to request /portfolio/accounts
@@ -379,19 +377,14 @@ print(pretty_request_response(accounts_response))
 
 # Initial, non-computed elements of request to /portfolio/accounts.
 method = 'GET'
-url = f'https://{baseUrl}/iserver/account/allocation/accounts'
+url = f'https://{baseUrl}/tickle'
 oauth_params = {
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
         "oauth_signature_method": "HMAC-SHA256",
         "oauth_timestamp": str(int(datetime.now().timestamp())),
-        "oauth_token": access_token,
-        "oauth_callback": "oob"
+        "oauth_token": access_token
     }
-
-# ----------------------------------
-# Generate request OAuth signature.
-# ----------------------------------
 
 # Combined param key=value pairs must be sorted alphabetically by key
 # and ampersand-separated.
@@ -427,6 +420,44 @@ headers = {"Authorization": oauth_header}
 headers["User-Agent"] = "python/3.11"
 
 # Prepare and send request to /portfolio/accounts, print request and response.
-accounts_request = requests.Request(method=method, url=url, headers=headers)
-accounts_response = session_object.send(accounts_request.prepare())
-print(pretty_request_response(accounts_response))
+tickle_request = requests.post(url=url, headers=headers)
+# tickle_response = session_object.send(tickle_request.prepare())
+print(pretty_request_response(tickle_request))
+
+global TICKLE_COOKIE
+TICKLE_COOKIE = tickle_request.json()['session']
+
+# Store web API session cookie value, if it is received.
+# (Used when opening websocket.)
+# session_cookie = TICKLE_COOKIE
+
+def on_message(ws, message):
+    print(message)
+
+def on_error(ws, error):
+    print(error)
+
+def on_close(ws, r1, r2):
+    print("## CLOSED! ##")
+    print(f"r1:{r1}")
+    print(f"r2:{r2}")
+
+def on_open(ws):
+    print("Opened Connection")
+    ws.send('{"session":"%s"}' % TICKLE_COOKIE)
+    time.sleep(2)
+    ws.send('ssd+DU5240685+{}')
+    time.sleep(2)
+    ws.send('usd+DU5240685+{}')
+
+if __name__ == "__main__":
+    ws = websocket.WebSocketApp(
+        url=f"wss://{baseUrl}/ws?oauth_token={access_token}",
+        on_open=on_open,
+        on_message=on_message,
+        on_error=on_error,
+        on_close=on_close,
+        header=["User-Agent: python/3.11"],
+        # cookie=f"api={session_cookie}"
+    )
+    ws.run_forever()
