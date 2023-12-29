@@ -1,25 +1,52 @@
 import requests
 import json
 import urllib3
+import time
 
 # Ignore insecure error messages
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-def orderRequest():
-  
-    base_url = "https://localhost:5000/v1/api/"
-    endpoint = "iserver/account/DU5240685/orders"
+ACCT_ID = "DU74649"
 
-    json_body = {
-        "orders": [{
-            "conid": 497222760,
-            "orderType": "STP LMT",
-            "price":4450,
-            "auxPrice":4460,
-            "side": "BUY",
-            "tif": "DAY",
-            "quantity": 10
-        }]
+def confirmReply(replyId):
+    print("Begin confirmReply")
+
+    url = f'https://localhost:5000/v1/api/iserver/reply/{replyId}'
+
+    jsonData={"confirmed":True}
+
+    confirm_request = requests.post(url=url, json=jsonData, verify=False)
+    if confirm_request.status_code == 200:
+        try:
+            if confirm_request.json()[0]["id"]:
+                confirmReply(confirm_request.json()[0]["id"])
+            else:
+                print(confirm_request.status_code)
+                print(confirm_request.json())
+        except:
+            print(confirm_request.status_code)
+    else:
+        print(confirm_request.status_code)
+        print(confirm_request.json())
+
+def orderRequest():
+    coid_iter = f"{int(time.time())}"
+    base_url = "https://localhost:5000/v1/api/"
+    endpoint = f"iserver/account/{ACCT_ID}/orders"
+
+    json_body =   {
+        "orders":[
+            {
+                "conid": 265598,
+                "cOID": f"test_{coid_iter}",
+                "orderType": "LMT",
+                "price":196,
+                "quantity": 10,
+                "side": "BUY",
+                "tif": "GTC",
+                # "outsideRTH":True
+            }
+        ]
     }
     
     
@@ -30,11 +57,11 @@ def orderRequest():
     print(order_json)
     try:
         if order_req.json()[0]["id"]:
-            print(order_req.json()[0]["id"])
-        else:
-            print(order_req.json()[0]["id"])
+            confirmReply(order_req.json()[0]["id"])
     except:
         pass
+
+
 
 if __name__ == "__main__":
     orderRequest()
