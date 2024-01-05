@@ -21,7 +21,7 @@ def on_close(ws):
 def on_open(ws):
     print("Opened Connection")
     time.sleep(3)
-    ws.send('ssd+DU5240685+{}') # This works in /tv environment.
+    ws.send('ssd+DU5240685+{"keys":["AccruedCash-S","ExcessLiquidity-S"],"fields":["currency","monetaryValue"]}') # This works in /tv environment.
 
 if __name__ == "__main__":
     ws = websocket.WebSocketApp(

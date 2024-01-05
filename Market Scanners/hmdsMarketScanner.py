@@ -8,16 +8,17 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def reqIserverScanner():
     base_url = "https://localhost:5000/v1/api/"
-    endpoint = "hmds/scanner/run"
+    endpoint = "hmds/scanner"
 
     scan_body = {
         "instrument":"STK",
         "locations": "STK.US.MAJOR",
         "scanCode": "TOP_PERC_GAIN",
         "secType": "STK",
-        "delayedLocations": "NYSE",
+        # "delayedLocations": "NYSE",
         "maxItems":25,
         "filters":[{
+            # "priceAbove":5
             # "maturityDateAbove": "20230131",
             # "maturityDateBelow": "",
             # "industryLike": "",
@@ -36,9 +37,9 @@ def reqIserverScanner():
     }
 
     scan_req = requests.post(url=base_url+endpoint, verify=False, json=scan_body)
-    scan_json = json.dumps(scan_req.json(), indent=2)
-
     print(scan_req.status_code)
+    if scan_req.status_code == 200:
+        scan_json = json.dumps(scan_req.json(), indent=2)
     print(scan_json)
     
 if __name__ == "__main__":
