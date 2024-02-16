@@ -7,7 +7,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def orderRequest():
   
-    base_url = "https://localhost:5000/v1/api/"
+    base_url = "https://localhost:5001/v1/api/"
     endpoint = "iserver/account/orders"
     
     order_req = requests.get(url=base_url+endpoint, verify=False)

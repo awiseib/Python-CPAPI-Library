@@ -4,16 +4,15 @@ import json
 # Disable SSL Warnings
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
+BASE_URL = "https://localhost:5001/v1/api"
 
 def contractSearch():
-    base_url = "https://localhost:5000/v1/api/"
-    endpoint = "iserver/secdef/search"
+    endpoint = "/iserver/secdef/search"
 
-    conid = "symbol=RELIANCE"
+    conid = "symbol=CL"
 
     params = "&".join([conid])
-    request_url = "".join([base_url, endpoint, "?", params])
+    request_url = "".join([BASE_URL, endpoint, "?", params])
 
     search_req = requests.get(url=request_url, verify=False)
 
@@ -26,16 +25,15 @@ def contractSearch():
 
 
 def contractStrikes():
-    base_url = "https://localhost:5000/v1/api/"
-    endpoint = "iserver/secdef/strikes"
+    endpoint = "/iserver/secdef/strikes"
 
-    conid = "conid=44652000"
-    secType = "secType=OPT"
-    month = "month=JAN24"
-    exchange = "exchange=NSE"
+    conid = "conid=17340715"
+    secType = "secType=FOP"
+    month = "month=MAR24"
+    exchange = "exchange=NYMEX"
 
     params = "&".join([conid, secType, month, exchange])
-    request_url = "".join([base_url, endpoint, "?", params])
+    request_url = "".join([BASE_URL, endpoint, "?", params])
 
     strikes_req = requests.get(url=request_url, verify=False)
 
@@ -48,5 +46,5 @@ def contractStrikes():
         pass
 
 if __name__ == "__main__":
-    contractSearch()
+    # contractSearch()
     contractStrikes()

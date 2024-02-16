@@ -9,10 +9,9 @@ def marketSnapshot():
     base_url = "https://localhost:5000/v1/api/"
     endpoint = "fyi/notifications/more"
 
-    id ="id=" # What is the ID? It doesn't return anything from the getNotiifications request.
+    id ="id=SM" # What is the ID? It doesn't return anything from the getNotiifications request.
 
-    params = "&".join([id])
-    request_url = "".join([base_url, endpoint, "?", params])
+    request_url = "".join([base_url, endpoint, "?", id])
 
     md_req = requests.get(url=request_url, verify=False)
     md_json = json.dumps(md_req.json(), indent=2)

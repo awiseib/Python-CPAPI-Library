@@ -28,3 +28,9 @@ if __name__ == "__main__":
         on_close=on_close
     )
     ws.run_forever(sslopt={"cert_reqs":ssl.CERT_NONE})
+
+'''
+Users without a signed server certificate should pass
+> sslopt={"cert_reqs":ssl.CERT_NONE}
+as an argument to ws.run_forever()
+'''

@@ -8,8 +8,6 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 def marketSnapshot():
     base_url = "https://localhost:5000/v1/api/"
     endpoint = "fyi/deliveryoptions/device"
-    
-    request_url = "".join([base_url, endpoint])
 
     json_body = {
         "devicename": "string",

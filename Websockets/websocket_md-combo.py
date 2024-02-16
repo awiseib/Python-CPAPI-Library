@@ -14,11 +14,11 @@ def on_close(ws):
 def on_open(ws):
     print("Opened Connection")
     time.sleep(3)
-    ws.send('smd+28812380;;;497222760/1,495512552/-1+{"fields":["31","84","86"]}')
+    ws.send('smd+0;;;679289300/1,679295546/-1+{"fields":["31","84","86"]}')
 
 if __name__ == "__main__":
     ws = websocket.WebSocketApp(
-        url="wss://localhost:5000/v1/api/ws",
+        url="wss://localhost:5001/v1/api/ws",
         on_open=on_open,
         on_message=on_message,
         on_error=on_error,
