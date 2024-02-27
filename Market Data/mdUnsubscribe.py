@@ -7,20 +7,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def historicalData(conidVal):
     base_url = "https://localhost:5000/v1/api/"
-    endpoint = "iserver/marketdata/history"
+    endpoint = f"iserver/marketdata/{conidVal}/unsubscribe"
 
-    conid=f"conid={conidVal}"
-    period="period=1w"
-    bar="bar=1d"
-    startTime="startTime=20230824-16:00:00"
-    outsideRth="outsideRth=true"
-    barType="barType=AllLast"
-
-    params = "&".join([conid, period, bar, startTime, outsideRth, barType])
-    request_url = "".join([base_url, endpoint, "?", params])
+    request_url = "".join([base_url, endpoint])
+    print(request_url)
 
     hd_req = requests.get(url=request_url, verify=False)
-    if hd_req.status_code == 500:
+    if hd_req.status_code != 200:
         print(hd_req.status_code)
         print(hd_req.text)
     else:

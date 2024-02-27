@@ -1,13 +1,6 @@
 import websocket
 import time
 import ssl
-import json
-
-
-"""
-This is based on internal code and is not a valid topic.
-Calls to this method will not show an error, but will never display positions data.
-"""
 
 def on_message(ws, message):
     print(message)
@@ -21,7 +14,8 @@ def on_close(ws):
 def on_open(ws):
     print("Opened Connection")
     time.sleep(3)
-    ws.send('sld+DU5240685') # Could also be sps+DU5240685 // spd+DU5240685 // rpl+DU524065
+    ws.send('sss+1073033368')
+    # unsubscribe with "uss+serverId"
 
 if __name__ == "__main__":
     ws = websocket.WebSocketApp(

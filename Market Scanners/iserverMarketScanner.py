@@ -11,8 +11,8 @@ def reqIserverScanner():
     endpoint = "iserver/scanner/run"
 
     scan_body = {
-        "instrument": "STK",
-        "location": "STK.US.MAJOR",
+        "instrument": "STOCK.HK",
+        "location": "STK.HK.NSE",
         "type": "TOP_PERC_GAIN",
         "filter": [
             {
