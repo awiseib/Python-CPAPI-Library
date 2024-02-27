@@ -82,7 +82,7 @@ def request_token():
 # Retrieve the Verifier token
 ###########
 def authorize(rToken):
-  url = f'https://interactivebrokers.com/authorize?oauth_token={rToken}'
+  url = f'https://interactivebrokers.com/authorize?oauth_token={rToken}&redirect_uri=http:\/\/localhost:20000/'
   verifier = input(f"Please log in to {url} and paste the 'oauth_verifier' value here: ")
   return verifier
 
@@ -251,34 +251,111 @@ def logout(access_token, live_session_token):
     print(logout_response)
   except:
     print(f"Logout: {logout_request.status_code}")
-
 ########
-# initialize session
+# portfolio/accounts
 ##########
-def init_session(access_token, live_session_token):
-  method = "POST"
-  url = f'https://{baseUrl}/iserver/auth/ssodh/init?publish=true&compete=true'
+def portfolio_accounts(access_token, live_session_token):
+  method = 'POST'
+  url = f'https://{baseUrl}/portfolio/accounts'
+  oauth_header = 'OAuth oauth_token="%s"' % access_token
+  headers = {"Authorization": oauth_header}
+  headers["User-Agent"] = "python/3.11"
   oauth_params = {
-      "oauth_consumer_key": consumer_key,
-      "oauth_nonce": hex(random.getrandbits(128))[2:],
-      "oauth_signature_method": "HMAC-SHA256",
-      "oauth_timestamp": str(int(datetime.now().timestamp())),
-      "oauth_token": access_token
-    }
+          "oauth_consumer_key": consumer_key,
+          "oauth_nonce": hex(random.getrandbits(128))[2:],
+          "oauth_signature_method": "HMAC-SHA256",
+          "oauth_timestamp": str(int(datetime.now().timestamp())),
+          "oauth_token": access_token
+      }
   params_string = "&".join([f"{k}={v}" for k, v in sorted(oauth_params.items())])
   base_string = f"{method}&{quote_plus(url)}&{quote(params_string)}"
   bytes_hmac_hash = HMAC.new(
-    key=base64.b64decode(live_session_token), 
-    msg=base_string.encode("utf-8"),
-    digestmod=SHA256
-    ).digest()
+      key=base64.b64decode(live_session_token), 
+      msg=base_string.encode("utf-8"),
+      digestmod=SHA256
+      ).digest()
   b64_str_hmac_hash = base64.b64encode(bytes_hmac_hash).decode("utf-8")
   oauth_params["oauth_signature"] = quote_plus(b64_str_hmac_hash)
   oauth_params["realm"] = realm
   oauth_header = "OAuth " + ", ".join([f'{k}="{v}"' for k, v in sorted(oauth_params.items())])
   headers = {"Authorization": oauth_header}
   headers["User-Agent"] = "python/3.11"
-  init_request = requests.post(url=url, headers=headers)
+
+  # Prepare and send request to /portfolio/accounts, print request and response.
+  init_request = requests.get(url=url, headers=headers)
+  print("portfolio/accounts")
+  print(f"Headers: {init_request.request.headers}")
+  init_response = json.dumps(init_request.json(), indent=2)
+  print(init_response)
+
+########
+# iserver/accounts
+##########
+def iserver_accounts(access_token, live_session_token):
+  method = 'GET'
+  url = f'https://{baseUrl}/iserver/accounts'
+  oauth_header = 'OAuth oauth_token="%s"' % access_token
+  headers = {"Authorization": oauth_header}
+  headers["User-Agent"] = "python/3.11"
+  oauth_params = {
+          "oauth_consumer_key": consumer_key,
+          "oauth_nonce": hex(random.getrandbits(128))[2:],
+          "oauth_signature_method": "HMAC-SHA256",
+          "oauth_timestamp": str(int(datetime.now().timestamp())),
+          "oauth_token": access_token
+      }
+  params_string = "&".join([f"{k}={v}" for k, v in sorted(oauth_params.items())])
+  base_string = f"{method}&{quote_plus(url)}&{quote(params_string)}"
+  bytes_hmac_hash = HMAC.new(
+      key=base64.b64decode(live_session_token), 
+      msg=base_string.encode("utf-8"),
+      digestmod=SHA256
+      ).digest()
+  b64_str_hmac_hash = base64.b64encode(bytes_hmac_hash).decode("utf-8")
+  oauth_params["oauth_signature"] = quote_plus(b64_str_hmac_hash)
+  oauth_params["realm"] = realm
+  oauth_header = "OAuth " + ", ".join([f'{k}="{v}"' for k, v in sorted(oauth_params.items())])
+  headers = {"Authorization": oauth_header}
+  headers["User-Agent"] = "python/3.11"
+
+  # Prepare and send request to /portfolio/accounts, print request and response.
+  init_request = requests.get(url=url, headers=headers)
+  print("iserver/accounts")
+  print(f"Headers: {init_request.request.headers}")
+  init_response = json.dumps(init_request.json(), indent=2)
+  print(init_response)
+
+########
+# initialize session
+##########
+def init_session(access_token, live_session_token):
+  method = 'POST'
+  url = f'https://{baseUrl}/iserver/auth/ssodh/init?publish=true&compete=true'
+  oauth_params = {
+          "oauth_consumer_key": consumer_key,
+          "oauth_nonce": hex(random.getrandbits(128))[2:],
+          "oauth_signature_method": "HMAC-SHA256",
+          "oauth_timestamp": str(int(datetime.now().timestamp())),
+          "oauth_token": access_token
+      }
+  params_string = "&".join([f"{k}={v}" for k, v in sorted(oauth_params.items())])
+  base_string = f"{method}&{quote_plus(url)}&{quote(params_string)}"
+  bytes_hmac_hash = HMAC.new(
+      key=base64.b64decode(live_session_token), 
+      msg=base_string.encode("utf-8"),
+      digestmod=SHA256
+      ).digest()
+  b64_str_hmac_hash = base64.b64encode(bytes_hmac_hash).decode("utf-8")
+  oauth_params["oauth_signature"] = quote_plus(b64_str_hmac_hash)
+  oauth_params["realm"] = realm
+  oauth_header = "OAuth " + ", ".join([f'{k}="{v}"' for k, v in sorted(oauth_params.items())])
+  headers = {"Authorization": oauth_header}
+  headers["User-Agent"] = "python/3.11"
+
+  # Prepare and send request to /portfolio/accounts, print request and response.
+  init_request = requests.post(url=url, headers=headers, json={})
+  print(f"URL: {url}")
+  print("Headers:", f'\n'.join(f'{name}: {value}' for name, value in init_request.request.headers.items()))
   init_response = json.dumps(init_request.json(), indent=2)
   print(init_response)
 
@@ -318,6 +395,8 @@ if __name__ == "__main__":
   vToken = authorize(rToken)
   aToken, aToken_secret = access_tokens(rToken, vToken)
   lst = generate_lst(aToken, aToken_secret)
-  logout(aToken, lst)
   init_session(aToken, lst)
+  # logout(aToken, lst)
+  portfolio_accounts(aToken, lst)
+  iserver_accounts(aToken, lst)
   # tickle(aToken, lst)

@@ -72,6 +72,8 @@ with open(current_user['signature'], "r") as f:
 with open(current_user['dhparam'], "r") as f:
     dh_param = RSA.importKey(f.read())
     dh_prime = dh_param.n
+    # print(f"dh_prime: {dh_prime}")
+    # exit()
     dh_generator = dh_param.e  # always =2
 
 # Enter your access token and access token secret here.
@@ -123,7 +125,6 @@ prepend = bytes_decrypted_secret.hex()
 
 # Put prepend at beginning of base string str.
 base_string = prepend
-
 # Elements of the LST request so far.
 method = 'POST'
 url = f'https://{baseUrl}/oauth/live_session_token'
@@ -319,7 +320,7 @@ print(pretty_request_response(logout_response))
 # -------------------------------------------------------------------
 
 # Initial, non-computed elements of request to /portfolio/accounts.
-method = 'GET'
+method = 'POST'
 url = f'https://{baseUrl}/iserver/auth/ssodh/init?publish=true&compete=true'
 oauth_params = {
         "oauth_consumer_key": consumer_key,
@@ -366,10 +367,13 @@ headers = {"Authorization": oauth_header}
 # Add User-Agent header, required for all requests. Can have any value.
 headers["User-Agent"] = "python/3.11"
 
-# Prepare and send request to /portfolio/accounts, print request and response.
+# Prepare and send request to /ssodh/init, print request and response.
 init_request = requests.Request(method=method, url=url, headers=headers)
 init_response = session_object.send(init_request.prepare())
 print(pretty_request_response(init_response))
+# init_request = requests.Request(method=method, url=url, headers=headers)
+# init_response = session_object.send(init_request.prepare())
+# print(pretty_request_response(init_response))
 
 # -------------------------------------------------------------------
 # Request #3: Using LST to request /portfolio/accounts
@@ -377,7 +381,7 @@ print(pretty_request_response(init_response))
 
 # Initial, non-computed elements of request to /portfolio/accounts.
 method = 'GET'
-url = f'https://{baseUrl}/tickle'
+url = f'https://{baseUrl}/iserver/auth/status'
 oauth_params = {
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
@@ -420,44 +424,40 @@ headers = {"Authorization": oauth_header}
 headers["User-Agent"] = "python/3.11"
 
 # Prepare and send request to /portfolio/accounts, print request and response.
-tickle_request = requests.post(url=url, headers=headers)
+tickle_request = requests.request(method=method, url=url, headers=headers)
 # tickle_response = session_object.send(tickle_request.prepare())
 print(pretty_request_response(tickle_request))
 
-global TICKLE_COOKIE
-TICKLE_COOKIE = tickle_request.json()['session']
+# global TICKLE_COOKIE
+# TICKLE_COOKIE = tickle_request.json()['session']
 
-# Store web API session cookie value, if it is received.
-# (Used when opening websocket.)
-# session_cookie = TICKLE_COOKIE
+# def on_message(ws, message):
+#     print(message)
 
-def on_message(ws, message):
-    print(message)
+# def on_error(ws, error):
+#     print(error)
 
-def on_error(ws, error):
-    print(error)
+# def on_close(ws, r1, r2):
+#     print("## CLOSED! ##")
+#     print(f"r1:{r1}")
+#     print(f"r2:{r2}")
 
-def on_close(ws, r1, r2):
-    print("## CLOSED! ##")
-    print(f"r1:{r1}")
-    print(f"r2:{r2}")
+# def on_open(ws):
+#     print("Opened Connection")
+#     ws.send('{"session":"%s"}' % TICKLE_COOKIE)
+#     time.sleep(2)
+#     ws.send('sor+{}')
+#     # time.sleep(2)
+#     # ws.send('usd+DU5240685+{}')
 
-def on_open(ws):
-    print("Opened Connection")
-    ws.send('{"session":"%s"}' % TICKLE_COOKIE)
-    time.sleep(2)
-    ws.send('ssd+DU5240685+{}')
-    time.sleep(2)
-    ws.send('usd+DU5240685+{}')
-
-if __name__ == "__main__":
-    ws = websocket.WebSocketApp(
-        url=f"wss://{baseUrl}/ws?oauth_token={access_token}",
-        on_open=on_open,
-        on_message=on_message,
-        on_error=on_error,
-        on_close=on_close,
-        header=["User-Agent: python/3.11"],
-        # cookie=f"api={session_cookie}"
-    )
-    ws.run_forever()
+# if __name__ == "__main__":
+#     ws = websocket.WebSocketApp(
+#         url=f"wss://{baseUrl}/ws?oauth_token={access_token}",
+#         on_open=on_open,
+#         on_message=on_message,
+#         on_error=on_error,
+#         on_close=on_close,
+#         header=["User-Agent: python/3.11"],
+#         # cookie=f"api={session_cookie}"
+#     )
+#     ws.run_forever()
