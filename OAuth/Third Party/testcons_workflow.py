@@ -19,7 +19,9 @@ from Crypto.Hash import SHA256, HMAC, SHA1
 import websocket
 import time
 
-key_dir = "D:\Code\Oauth_Demo\web.demo\keys\\"
+
+key_dir = "./keys/"
+
 with open(key_dir+"private_encryption.pem", "r") as f:
   encryption_key = RSA.import_key(f.read())
 
@@ -330,7 +332,7 @@ def iserver_accounts(access_token, live_session_token):
 ##########
 def init_session(access_token, live_session_token):
   method = 'POST'
-  url = f'https://{baseUrl}/iserver/auth/ssodh/init?publish=true&compete=true'
+  url = f'https://{baseUrl}/iserver/auth/ssodh/init'
   oauth_params = {
           "oauth_consumer_key": consumer_key,
           "oauth_nonce": hex(random.getrandbits(128))[2:],
@@ -353,7 +355,7 @@ def init_session(access_token, live_session_token):
   headers["User-Agent"] = "python/3.11"
 
   # Prepare and send request to /portfolio/accounts, print request and response.
-  init_request = requests.post(url=url, headers=headers, json={})
+  init_request = requests.post(url=url, headers=headers, json={"publish":True,"compete":True})
   print(f"URL: {url}")
   print("Headers:", f'\n'.join(f'{name}: {value}' for name, value in init_request.request.headers.items()))
   init_response = json.dumps(init_request.json(), indent=2)
@@ -364,7 +366,7 @@ def init_session(access_token, live_session_token):
 ###########
 def tickle(access_token, live_session_token):
   method = "GET"
-  url = f'https://api.ibkr.com/tickle'
+  url = f'https://{baseUrl}/tickle'
   oauth_params = {
       "oauth_consumer_key": consumer_key,
       "oauth_nonce": hex(random.getrandbits(128))[2:],
@@ -386,9 +388,30 @@ def tickle(access_token, live_session_token):
   headers = {"Authorization": oauth_header}
   headers["User-Agent"] = "python/3.11"
   tickle_request = requests.get(url=url, headers=headers)
-  session_token = tickle_request.json()['session']
-  print(session_token)
-  return session_token
+  try:
+    session_token = tickle_request.json()['session']
+    print(session_token)
+    return session_token
+  except:
+    print("Tickle error code:", tickle_request.status_code)
+    print("Tickle error content:", tickle_request.content)
+
+def on_message(ws, message):
+    print(message)
+
+def on_error(ws, error):
+    print(error)
+
+def on_close(ws, r1, r2):
+    print("## CLOSED! ##")
+    print(f"r1:{r1}")
+    print(f"r2:{r2}")
+
+def on_open(ws):
+    print("Opened Connection")
+    time.sleep(2)
+    ws.send('smd+265598+{"fields":["31","84","86"]}')
+
 
 if __name__ == "__main__":
   rToken = request_token()
@@ -398,5 +421,17 @@ if __name__ == "__main__":
   init_session(aToken, lst)
   # logout(aToken, lst)
   portfolio_accounts(aToken, lst)
-  iserver_accounts(aToken, lst)
-  # tickle(aToken, lst)
+  # iserver_accounts(aToken, lst)
+  
+  # The /tickle endpoint MUST be called prior to opening the Websocket.
+  session_token = tickle(aToken, lst)
+  ws = websocket.WebSocketApp(
+      url=f"wss://{baseUrl}/ws?oauth_token={aToken}",
+      on_open=on_open,
+      on_message=on_message,
+      on_error=on_error,
+      on_close=on_close,
+      header=["User-Agent: python/3.11"],
+      cookie=f"api={session_token}"
+  )
+  ws.run_forever()
