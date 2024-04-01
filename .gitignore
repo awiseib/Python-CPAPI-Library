@@ -1,6 +1,10 @@
 /__pycache__
-*/__pycache__
-/jenk
+/Websockets/jenk
+.gitignore
+/Websockets/*
+/OAuth/First Party/minimum_oauth.py
+/OAuth/First Party/modular_oauth_impl.py
+/Orders/fastCancel
 cp_allFaCombos.py
 hmdsScannerParams.xml
 ibcpapi.py
@@ -10,4 +14,4 @@ prettyPrint.py
 scannerParams.xml
 test.py
 credentials.json
-Websockets/jenk
+websocket_to_excel.py

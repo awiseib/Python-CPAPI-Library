@@ -178,7 +178,7 @@ def generate_lst(access_token, access_token_secret):
     print(f"ERROR: Request to /live_session_token failed. Exiting...")
     raise SystemExit(0)
   response_data = lst_request.json()
-  print(json.dumps(response_data, indent=2))
+  print(lst_response)
   dh_response = response_data["diffie_hellman_response"]
   lst_signature = response_data["live_session_token_signature"]
   lst_expiration = response_data["live_session_token_expiration"]
