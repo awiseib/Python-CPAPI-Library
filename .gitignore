@@ -1,6 +1,6 @@
 /__pycache__
 /Websockets/jenk
-.gitignore
+
 /Websockets/*
 /OAuth/First Party/minimum_oauth.py
 /OAuth/First Party/modular_oauth_impl.py

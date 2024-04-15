@@ -20,7 +20,7 @@ import websocket
 import time
 
 
-key_dir = "./keys/"
+key_dir = ".\\OAuth\\Third Party\\keys\\"
 
 with open(key_dir+"private_encryption.pem", "r") as f:
   encryption_key = RSA.import_key(f.read())
