@@ -58,7 +58,7 @@ def pretty_request_response(resp: requests.Response) -> str:
 # You will need to replace the filepath to recognize your own. 
 # Alternatively, create a string directly linking to the various PEM files or strings referenced. 
 credentials = json.load(open(file=r"D:\Code\Python CPAPI Library\credentials.json", mode="r"))
-current_user = credentials['user2']
+current_user = credentials['user5']
 
 # Replace with path to private encryption key file.
 with open(current_user['encryption'], "r") as f:
@@ -321,7 +321,7 @@ print(pretty_request_response(logout_response))
 
 # Initial, non-computed elements of request to /portfolio/accounts.
 method = 'POST'
-url = f'https://{baseUrl}/iserver/auth/ssodh/init?publish=true&compete=true'
+url = f'https://{baseUrl}/iserver/auth/ssodh/init'
 oauth_params = {
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
@@ -367,13 +367,11 @@ headers = {"Authorization": oauth_header}
 # Add User-Agent header, required for all requests. Can have any value.
 headers["User-Agent"] = "python/3.11"
 
+json_data = {"publish":True, "compete":True}
+
 # Prepare and send request to /ssodh/init, print request and response.
-init_request = requests.Request(method=method, url=url, headers=headers)
-init_response = session_object.send(init_request.prepare())
-print(pretty_request_response(init_response))
-# init_request = requests.Request(method=method, url=url, headers=headers)
-# init_response = session_object.send(init_request.prepare())
-# print(pretty_request_response(init_response))
+init_request = requests.post(url=url, headers=headers, json=json_data)
+print(pretty_request_response(init_request))
 
 # -------------------------------------------------------------------
 # Request #3: Using LST to request /portfolio/accounts
@@ -381,7 +379,7 @@ print(pretty_request_response(init_response))
 
 # Initial, non-computed elements of request to /portfolio/accounts.
 method = 'GET'
-url = f'https://{baseUrl}/iserver/auth/status'
+url = f'https://{baseUrl}/tickle'
 oauth_params = {
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
@@ -425,39 +423,35 @@ headers["User-Agent"] = "python/3.11"
 
 # Prepare and send request to /portfolio/accounts, print request and response.
 tickle_request = requests.request(method=method, url=url, headers=headers)
-# tickle_response = session_object.send(tickle_request.prepare())
 print(pretty_request_response(tickle_request))
 
-# global TICKLE_COOKIE
-# TICKLE_COOKIE = tickle_request.json()['session']
+global TICKLE_COOKIE
+TICKLE_COOKIE = tickle_request.json()['session']
 
-# def on_message(ws, message):
-#     print(message)
+def on_message(ws, message):
+    print(message)
 
-# def on_error(ws, error):
-#     print(error)
+def on_error(ws, error):
+    print(error)
 
-# def on_close(ws, r1, r2):
-#     print("## CLOSED! ##")
-#     print(f"r1:{r1}")
-#     print(f"r2:{r2}")
+def on_close(ws, r1, r2):
+    print("## CLOSED! ##")
+    print(f"r1:{r1}")
+    print(f"r2:{r2}")
 
-# def on_open(ws):
-#     print("Opened Connection")
-#     ws.send('{"session":"%s"}' % TICKLE_COOKIE)
-#     time.sleep(2)
-#     ws.send('sor+{}')
-#     # time.sleep(2)
-#     # ws.send('usd+DU5240685+{}')
+def on_open(ws):
+    print("Opened Connection")
+    time.sleep(2)
+    ws.send('smd+265598+{"fields":["84","85","86","88"]}')
 
-# if __name__ == "__main__":
-#     ws = websocket.WebSocketApp(
-#         url=f"wss://{baseUrl}/ws?oauth_token={access_token}",
-#         on_open=on_open,
-#         on_message=on_message,
-#         on_error=on_error,
-#         on_close=on_close,
-#         header=["User-Agent: python/3.11"],
-#         # cookie=f"api={session_cookie}"
-#     )
-#     ws.run_forever()
+if __name__ == "__main__":
+    ws = websocket.WebSocketApp(
+        url=f"wss://{baseUrl}/ws?oauth_token={access_token}",
+        on_open=on_open,
+        on_message=on_message,
+        on_error=on_error,
+        on_close=on_close,
+        header=["User-Agent: python/3.11"],
+        cookie=f"api={TICKLE_COOKIE}"
+    )
+    ws.run_forever()

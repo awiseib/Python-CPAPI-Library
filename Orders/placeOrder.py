@@ -34,22 +34,19 @@ def orderRequest():
     base_url = "https://localhost:5001/v1/api/"
     endpoint = f"iserver/account/{ACCT_ID}/orders"
 
-    # json_body =   {
-    #     "orders":[
-    #         {
-    #             "conid": 479624278, # BTC
-    #             "listingExchange":"PAXOS",
-    #             # "cOID": f"test_{coid_iter}",
-    #             "orderType": "STP",
-    #             "price": 43925,
-    #             "quantity": 0.0123,
-    #             "side": "SELL",
-    #             "tif": "Minutes",
-    #             # "outsideRTH":True
-    #         }
-    #     ]
-    # }
-    json_body = {'orders': [{'acctId': f'{ACCT_ID}', 'conid': 265598, 'conidex': '265598@SMART', 'secType': '265598@STK', 'cOID': 'AAPL-BUY-100', 'parentId': None, 'orderType': 'TRAILLMT', 'listingExchange': 'NASDAQ', 'isSingleGroup': False, 'outsideRTH': True, 'price': 185.5, 'auxPrice': 183, 'side': 'BUY', 'ticker': 'AAPL', 'tif': 'GTC', 'trailingAmt': 1.0, 'trailingType': 'amt', 'referrer': 'QuickTrade', 'quantity': 100, 'useAdaptive': False, 'isCcyConv': False, 'strategy': 'Vwap', 'strategyParameters': {'MaxPctVol': '0.1', 'StartTime': '14:00:00 EST', 'EndTime': '15:00:00 EST', 'AllowPastEndTime': True}}]}
+    json_body =   {
+        "orders":[
+            {
+                "conid": 265598,
+                "orderType": "LMT",
+                "price": 170,
+                "quantity": 1,
+                "side": "BUY",
+                "tif": "DAY",
+                # "outsideRTH":True
+            }
+        ]
+    }
     
     order_req = requests.post(url=base_url+endpoint, verify=False, json=json_body)
     order_json = json.dumps(order_req.json(), indent=2)
