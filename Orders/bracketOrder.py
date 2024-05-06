@@ -7,27 +7,37 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def orderRequest():
   
-    base_url = "https://localhost:5000/v1/api/"
+    base_url = "https://localhost:5001/v1/api/"
     endpoint = "iserver/account/DU5240685/orders"
 
     json_body = {
         "orders":[
             {
-            "cOID":"NQ_STOP_oRTH3",
-            "conid": 568549928,
+            "cOID":"AAPL_BKT2",
+            "conid": 265598,
             "orderType": "LMT",
-            "price":15584.25,
+            "price":160.25,
+            "side": "BUY",
+            "tif": "DAY",
+            "quantity": 1,
+            "outsideRth":1
+            },
+            {
+            "parentId":"AAPL_BKT2",
+            "conid": 265598,
+            "orderType": "MKT",
+            # "price":160,
             "side": "SELL",
             "tif": "DAY",
             "quantity": 1,
             "outsideRth":1
             },
             {
-            "parentId":"NQ_STOP_oRTH3",
-            "conid": 568549928,
+            "parentId":"AAPL_BKT2",
+            "conid": 265598,
             "orderType": "STP",
-            "price":15590,
-            "side": "BUY",
+            "price":163,
+            "side": "SELL",
             "tif": "DAY",
             "quantity": 1,
             "outsideRth":1

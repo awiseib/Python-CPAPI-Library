@@ -25,6 +25,7 @@ def confirmReply(replyId):
                 print(confirm_request.json())
         except:
             print(confirm_request.status_code)
+            print(confirm_request.json())
     else:
         print(confirm_request.status_code)
         print(confirm_request.json())
@@ -37,10 +38,10 @@ def orderRequest():
     json_body =   {
         "orders":[
             {
-                "conid": 265598,
-                "orderType": "LMT",
-                "price": 170,
-                "quantity": 1,
+                "conid": 542132600,
+                "orderType": "MKT",
+                "cashQty": 158,
+                # "quantity": 1,
                 "side": "BUY",
                 "tif": "DAY",
                 # "outsideRTH":True

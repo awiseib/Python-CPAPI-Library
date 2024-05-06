@@ -420,8 +420,9 @@ if __name__ == "__main__":
   lst = generate_lst(aToken, aToken_secret)
   init_session(aToken, lst)
   # logout(aToken, lst)
-  portfolio_accounts(aToken, lst)
-  # iserver_accounts(aToken, lst)
+  time.sleep(3)
+  # portfolio_accounts(aToken, lst)
+  iserver_accounts(aToken, lst)
   
   # The /tickle endpoint MUST be called prior to opening the Websocket.
   session_token = tickle(aToken, lst)
