@@ -8,6 +8,7 @@ Enter configuration values in Prequisites section below before running.
 """
 import json
 import requests
+import pprint
 import random
 import base64
 from datetime import datetime
@@ -36,6 +37,35 @@ realm = "test_realm"
 baseUrl = "api.ibkr.com/v1/api"
 callback = "oob"
 
+
+# List of response headers to print (all others discarded)
+RESP_HEADERS_TO_PRINT = ["Content-Type", "Content-Length", "Date", "Set-Cookie", "User-Agent"]
+
+def pretty_request_response(resp: requests.Response) -> str:
+    """Print request and response legibly."""
+    req = resp.request
+    rqh = '\n'.join(f"{k}: {v}" for k, v in req.headers.items())
+    rqh = rqh.replace(', ', ',\n    ')
+    rqb = f"\n{pprint.pformat(json.loads(req.body))}\n" if req.body else ""
+    try:
+        rsb = f"\n{pprint.pformat(resp.json())}\n" if resp.text else ""
+    except json.JSONDecodeError:
+        rsb = resp.text
+    rsh = '\n'.join([f"{k}: {v}" for k, v in resp.headers.items() if k in RESP_HEADERS_TO_PRINT])
+    return_str = '\n'.join([
+        80*'-',
+        '-----------REQUEST-----------',
+        f"{req.method} {req.url}",
+        rqh,
+        f"{rqb}",
+        '-----------RESPONSE-----------',
+        f"{resp.status_code} {resp.reason}",
+        rsh,
+        f"{rsb}\n",
+    ])
+    return return_str
+
+
 ###########
 # Obtaining Request Token
 ###########
@@ -46,7 +76,7 @@ def request_token():
     "oauth_consumer_key": consumer_key,
     "oauth_nonce": hex(random.getrandbits(128))[2:],
     "oauth_signature_method": "RSA-SHA256",
-    "oauth_timestamp": str(int(datetime.now().timestamp())),
+    "oauth_timestamp": str(int(datetime.now().timestamp()))
     }
   params_string = "&".join([f"{k}={v}" for k, v in sorted(oauth_params.items())])
 
@@ -69,16 +99,14 @@ def request_token():
   
   request_request = requests.post(url=url, headers=headers)
   
+  print(pretty_request_response(request_request))
+
   if request_request.status_code == 200:
-    request_response = json.dumps(request_request.json(), indent=2)
-    print(request_response)
     rToken = request_request.json()["oauth_token"]
+    return rToken
   else:
-    print("Failed to retrieve Request Token")
-    print(f"{request_request.status_code}: {request_request.content}")
-    print(request_request.request.headers)
-  
-  return rToken
+    print("Failed to generate request token. Quitting out.")
+    exit()
 
 ###########
 # Retrieve the Verifier token
@@ -122,15 +150,13 @@ def access_tokens(rToken, vToken):
   headers["User-Agent"] = "python/3.11"
   
   request_request = requests.post(url=url, headers=headers)
-  
+  print(pretty_request_response(request_request))
   if request_request.status_code == 200:
-    request_response = json.dumps(request_request.json(), indent=2)
-    print(request_response)
     aToken = request_request.json()["oauth_token"]
     aToken_secret = request_request.json()["oauth_token_secret"]
   else:
-    print(f"{request_request.status_code}: {request_request.content}")
-    print(request_request.request.headers )
+    print("Access Token request failed! Exiting")
+    exit()
   
   return aToken, aToken_secret
 
@@ -173,12 +199,13 @@ def generate_lst(access_token, access_token_secret):
   headers = {"Authorization": oauth_header}
   headers["User-Agent"] = "python/3.11"
   lst_request = requests.post(url=url, headers=headers)
-  lst_response = json.dumps(lst_request.json())
+  print(pretty_request_response(lst_request))
+
   if lst_request.status_code != 200:
     print(f"ERROR: Request to /live_session_token failed. Exiting...")
     raise SystemExit(0)
   response_data = lst_request.json()
-  print(lst_response)
+  
   dh_response = response_data["diffie_hellman_response"]
   lst_signature = response_data["live_session_token_signature"]
   lst_expiration = response_data["live_session_token_expiration"]
