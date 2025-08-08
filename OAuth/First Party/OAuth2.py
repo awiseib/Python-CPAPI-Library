@@ -14,10 +14,10 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ip = requests.get("https://api.ipify.org", verify=False).text
 
-clientId = 'YOUR_CLIENT_ID_HERE'   # ClientID Provided by Interactive Brokers after registration.                              
+clientId = 'YOUR_CLIENT_ID_HERE'               # ClientID Provided by Interactive Brokers after registration.                              
 clientKeyId = 'main'  
-credential = 'YOUR_CREDENTIAL HERE'  # Credential will reflect the username authenticating with.  
-path_to_PrivateKey = r"C:\Users\awise\Code\OAuth2\RSA Key\privatekey.pem" #Path to your private RSA Key for CP API
+credential = 'YOUR_CREDENTIAL HERE'            # Credential will reflect the username authenticating with.  
+path_to_PrivateKey = r"path/to/privatekey.pem" # Path to your private RSA Key for CP API
 scope = "sso-sessions.write"
  
 
@@ -125,18 +125,6 @@ def standard_request( request_method, request_url, bearer_token, req_content="{}
         print(str(ex))
         return ""
 
-def get_my_ip():
-    """Get the client's public IP address"""
-    try:
-        response = session.get("https://api.ipify.org")
-        if response.status_code != 200:
-            print("IP Request Failed")
-            web_header_print(response.request, response)
-        else:
-            return response.text
-    except Exception as ex:
-        print(str(ex))
-    return ""
 def base64_encode(val):
     return base64.b64encode(val).decode().replace('+', '-').replace('/', '_').rstrip('=')
 
