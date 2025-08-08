@@ -217,7 +217,7 @@ def getBearerToken(access_token: str):
         return bearer_request.json()["access_token"]
     return
 
-def oauth2_main():
+if __name__ == "__main__":
     """Main method to execute the OAuth2 flow"""
     # Request #1: Request an Access Token
     accessToken = getAccessToken()
@@ -236,6 +236,3 @@ def oauth2_main():
     # Request #4: Confirm valid accounts within the portfolio
     endpoint = "/iserver/accounts"
     standard_request("GET", f"https://{clientPortalUrl}{endpoint}", bearerToken)
-
-if __name__ == "__main__":
-    oauth2_main()
