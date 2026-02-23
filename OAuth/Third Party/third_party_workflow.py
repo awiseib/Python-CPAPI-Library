@@ -66,7 +66,7 @@ path_to_dhparam = "Path\\To\\Your\\dhparam.pem"
 # If substituting your own consumer key created via the Self-Service Portal,
 # change realm to "limited_poa" (test_realm is for TESTCONS only).
 realm = "test_realm" if consumer_key == "TESTCONS" else "limited_poa"
-callback = "oob" if consumer_key == "TESTCONS" else "" # PUT YOUR CALLBACK URL HERE.
+redirect_uri = "" # PUT YOUR CALLBACK URL HERE.
 
 
 # Replace with path to private encryption key file.
@@ -95,7 +95,7 @@ baseUrl = "api.ibkr.com/v1/api"
 def get_request_token():
     url = f'https://{baseUrl}/oauth/request_token'
     oauth_params = {
-        "oauth_callback":callback,
+        "oauth_callback":"oob",
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
         "oauth_signature_method": "RSA-SHA256",
@@ -135,7 +135,7 @@ def get_request_token():
 # Retrieve the Verifier token
 ###########
 def authorize(rToken):
-    url = f'https://interactivebrokers.com/authorize?oauth_token={rToken}&redirect_uri=http:\/\/localhost:20000/'
+    url = f'https://interactivebrokers.com/authorize?oauth_token={rToken}&redirect_uri={redirect_uri}'
     verifier = input(f"Please log in to {url} and paste the 'oauth_verifier' value here: ")
     return verifier
 
@@ -145,7 +145,7 @@ def authorize(rToken):
 def get_access_tokens(rToken, vToken):
     url = f'https://{baseUrl}/oauth/access_token'
     oauth_params = {
-        "oauth_callback":callback,
+        "oauth_callback":"oob",
         "oauth_consumer_key": consumer_key,
         "oauth_nonce": hex(random.getrandbits(128))[2:],
         "oauth_signature_method": "RSA-SHA256",
